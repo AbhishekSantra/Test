@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  InstanceType:
+    Type: String
+    Default: t2.micro
+    Description: EC2 instance type
+
+  ImageId:
+    Description: AMI ID for the EC2 instance
+    Type: String
+    Default: ami-0a4408457f9a03be3
+
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
+
+Resources:
+
+  VpcWithInstance:
+    Type: Abhishek::EC2::VPC::MODULE
+    Properties:
+      VpcCidr: 10.0.0.0/16
+      NameTag: abhishek
+      InstanceType: !Ref InstanceType
+      ImageId: !Ref ImageId
+      KeyName: !Ref KeyName
+  
+  MyInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      ImageId: !Ref ImageId
+      KeyName: !Ref KeyName
+      SubnetId: !Ref VpcWithInstance.Public1Subnet
+      SecurityGroupIds:
+        - !Ref VpcWithInstance.EC2SecurityGroup
